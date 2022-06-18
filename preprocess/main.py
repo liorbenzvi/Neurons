@@ -1,5 +1,6 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
+import matplotlib.pyplot as plt
 
 def load_data(file_name):
     print("Load data from file: " + file_name)
@@ -29,6 +30,12 @@ def data_exploration(df):
         print('Amount of missing values: ' + str(df[col].isna().sum()))
         print('Count amounts by value: ')
         print(df[col].value_counts())
+
+    print('\nCorrelation matrix: ')
+    corr_matrix = df.corr()
+    print(corr_matrix)
+    plt.imshow(corr_matrix, cmap='hot', interpolation='nearest')
+    plt.show()
 
 
 if __name__ == '__main__':
