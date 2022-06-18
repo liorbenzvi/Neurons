@@ -1,5 +1,5 @@
 import pandas as pd
-
+from pandas.api.types import is_numeric_dtype
 
 def load_data(file_name):
     print("Load data from file: " + file_name)
@@ -19,11 +19,12 @@ def data_exploration(df):
     print('Describe by columns')
     for col in df.columns:
         print('Statistics for column: ' + col)
-        print('Average: ' + str(df[col].mean()))
-        print('Median: ' + str(df[col].median()))
-        print('Standard deviation: ' + str(df[col].std()))
-        print('Max value: ' + str(df[col].max()))
-        print('Min value: ' + str(df[col].min()))
+        if is_numeric_dtype(df[col]):
+            print('Average: ' + str(df[col].mean()))
+            print('Median: ' + str(df[col].median()))
+            print('Standard deviation: ' + str(df[col].std()))
+            print('Max value: ' + str(df[col].max()))
+            print('Min value: ' + str(df[col].min()))
         print('Amount of distinct values: ' + str(len(pd.unique(df[col]))))
         print('Amount of missing values: ' + str(df[col].isna().sum()))
         print('Count amounts by value: ')
