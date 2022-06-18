@@ -14,7 +14,7 @@ def data_exploration(df):
     print('General describe: ')
     print(df.describe())
     print(df.info())
-    print('Amount of rows: ' + str(len(df.rows)))
+    print('Amount of rows: ' + str(len(df)))
     print('Amount of columns: ' + str(len(df.columns)))
     print('Describe by columns')
     for col in df.columns:
@@ -24,7 +24,6 @@ def data_exploration(df):
         print('Standard deviation: ' + str(df[col].std()))
         print('Max value: ' + str(df[col].max()))
         print('Min value: ' + str(df[col].min()))
-
         print('Amount of distinct values: ' + str(len(pd.unique(df[col]))))
         print('Amount of missing values: ' + str(df[col].isna().sum()))
         print('Count amounts by value: ')
