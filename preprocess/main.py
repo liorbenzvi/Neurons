@@ -2,6 +2,7 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import matplotlib.pyplot as plt
 
+
 def load_data(file_name):
     print("Load data from file: " + file_name)
     df = pd.read_csv("../data/" + file_name + ".csv", encoding="UTF-8")
