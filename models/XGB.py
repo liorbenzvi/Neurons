@@ -1,10 +1,10 @@
-import numpy as np
 from sklearn.metrics import ConfusionMatrixDisplay, recall_score
 from xgboost import XGBClassifier
 import matplotlib.pyplot as plt
 from preprocess.main import load_data, prepare_df_for_learning, get_x_y
 from sklearn.metrics import precision_score
 from sklearn import metrics
+from sklearn.model_selection import RandomizedSearchCV
 
 
 def train_xgb(x_train, x_test, y_train, y_test):
@@ -66,6 +66,24 @@ def print_auc_plt(clf, x_test, y_test, is_oversampled):
     plt.clf()
 
 
+def parameter_tuning(x, y):
+    param_test = {
+        'max_depth': range(3, 80),
+        'min_child_weight': range(1, 20),
+        'learning_rate': [i / 10.0 for i in range(1, 9)],
+        'n_estimators': range(10, 200, 10),
+        'gamma': [i / 10.0 for i in range(0, 5)],
+        'subsample': [i / 10.0 for i in range(2, 10)],
+        'colsample_bytree': [i / 10.0 for i in range(2, 10)]
+    }
+    gsearch1 = RandomizedSearchCV(estimator=XGBClassifier(), param_distributions=param_test, n_iter=100, cv=3,
+                                  verbose=2, random_state=42, n_jobs=-1)
+    gsearch1.fit(x, y)
+    print('\n\nResults: ')
+    print(gsearch1.best_params_)
+    print(gsearch1.best_score_)
+
+
 if __name__ == '__main__':
     df = load_data("ctr_dataset_train")
     df = prepare_df_for_learning(df)
@@ -81,6 +99,4 @@ if __name__ == '__main__':
     print_evaluation_metrics(oversampled_clf, oversampled_test_pred, oversampled_train_pred, x_train, x_test,
                              y_train, y_test, True)
 
-
-
-
+    parameter_tuning(x, y)
