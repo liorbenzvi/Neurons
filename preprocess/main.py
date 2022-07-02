@@ -49,13 +49,32 @@ def oversampling_with_smote(X, y):
 
 
 def handle_missing_values(df):
+    # todo please complete this method
     df = df.fillna(-1)
+    return df
+
+
+def add_new_features(df):
+    df = add_date_features(df)
+    df['is_private'] = (df['Floor'] == 0.0).astype(int)
+    df['is_alone_in_floor'] = (df['Num_residents_floor'] == 1.0).astype(int)
+    return df
+
+
+def add_date_features(df):
+    df[['day', 'month', 'year']] = df['Date'].str.split('/', expand=True)
+    df['year'] = df['year'].fillna(-1)
+    df['year'] = df['year'].astype(int)
+    df['years_until_today'] = 2022 - df['year']
+    df['years_until_today'] = df['years_until_today'].replace(2023, -1)
+    df = df.drop(columns=['day', 'Date'])
     return df
 
 
 def prepare_df_for_learning(df):
     df = remove_rows_without_target_value(df)
     df = handle_missing_values(df)
+    df = add_new_features(df)
     df = label_encoding(df)
     return df
 
