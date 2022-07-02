@@ -84,12 +84,18 @@ def get_x_y(df):
     x_filter = df.columns[~df.columns.isin(y_filter)]
     x_train, x_test, y_train, y_test = train_test_split(df[x_filter], df[y_filter], test_size=0.2, random_state=1)
     x_train_resampled, y_train_resampled = oversampling_with_smote(x_train, y_train)
+    print_oversampling_info(x_train, x_train_resampled)
+    return x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled
+
+
+def print_oversampling_info(x_train, x_train_resampled):
+    print('\n\n')
+    print('Oversampling with smote: ')
     train_rows = len(x_train)
     resampled_train_rows = len(x_train_resampled)
     print('Amount of rows in regular training set is: ' + str(train_rows))
     print('Amount of rows in oversampled training set is: ' + str(resampled_train_rows))
     print('Added ' + str(resampled_train_rows - train_rows) + ' synthetic rows')
-    return x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled
 
 
 if __name__ == '__main__':
