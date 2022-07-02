@@ -34,11 +34,10 @@ def data_exploration(df):
 
     print('\nCorrelation matrix: ')
     corr_matrix = df.corr()
+    corr_matrix.to_csv("../data/correlation_matrix.csv", encoding="UTF-8")
     print(corr_matrix.to_string())
-    print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in corr_matrix]))
     plt.imshow(corr_matrix, cmap='hot', interpolation='nearest')
     plt.savefig('correlation_matrix.png')
-    # plt.show()
 
 
 if __name__ == '__main__':
