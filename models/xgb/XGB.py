@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.metrics import ConfusionMatrixDisplay, recall_score
 from xgboost import XGBClassifier
 import matplotlib.pyplot as plt
@@ -44,6 +45,14 @@ def print_confusion_matrix(clf, x, y, is_oversampled=False):
     plt.clf()
 
 
+def print_business_value(y_true, y_pred):
+    # True Positive (TP): we predict a label of 1 (positive), and the true label is 1.
+    TP = len([y_pred_i for y_pred_i, y_true_j in zip(y_pred, y_true.values) if y_pred_i == 1 and y_true_j == 1])
+    # False Positive (FP): we predict a label of 1 (positive), but the true label is 0.
+    FP =  len([y_pred_i for y_pred_i, y_true_j in zip(y_pred, y_true.values) if y_pred_i == 1 and y_true_j == 0])
+    print('Total business value from model is: ' + str(TP * 420 - FP * 200))
+
+
 def print_evaluation_metrics(clf, test_pred, train_pred, x_train, x_test, y_train, y_test, is_oversampled=False):
     print('\n\n')
     print('Model evaluation_metrics: ')
@@ -52,7 +61,7 @@ def print_evaluation_metrics(clf, test_pred, train_pred, x_train, x_test, y_trai
     print('Precision score is: ' + str(precision_score(y_test, test_pred)))
     print('Recall score is: ' + str(recall_score(y_test, test_pred)))
     print_auc_plt(clf, x_test, y_test, is_oversampled)
-    # print business value
+    print_business_value(y_test, test_pred)
 
 
 def print_auc_plt(clf, x_test, y_test, is_oversampled):
@@ -67,6 +76,8 @@ def print_auc_plt(clf, x_test, y_test, is_oversampled):
 
 
 def parameter_tuning(x, y):
+    print('\n\n')
+    print('Parameter Tuning: ')
     param_test = {
         'max_depth': range(3, 80),
         'min_child_weight': range(1, 20),
