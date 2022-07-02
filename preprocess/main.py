@@ -43,10 +43,10 @@ def data_exploration(df):
 def prepare_df_for_learning(df):
     df = remove_rows_without_target_value(df)
     return df
-    # 2608
 
 
 def remove_rows_without_target_value(df):
+    print('Remove rows without target value: ')
     rows_before = len(df)
     print('Amount of rows in df is: ' + str(rows_before))
     print('Going to remove rows without Purchase value')
@@ -60,4 +60,5 @@ def remove_rows_without_target_value(df):
 if __name__ == '__main__':
     df = load_data("ctr_dataset_train")
     data_exploration(df)
+    print('\n\n')
     df = prepare_df_for_learning(df)
