@@ -40,6 +40,24 @@ def data_exploration(df):
     plt.savefig('correlation_matrix.png')
 
 
+def prepare_df_for_learning(df):
+    df = remove_rows_without_target_value(df)
+    return df
+    # 2608
+
+
+def remove_rows_without_target_value(df):
+    rows_before = len(df)
+    print('Amount of rows in df is: ' + str(rows_before))
+    print('Going to remove rows without Purchase value')
+    df = df.drop(df[df.Purchase == -1].index)
+    rows_after = len(df)
+    print('Amount of rows in df is: ' + str(rows_after))
+    print('Total ' + str(rows_before - rows_after) + ' rows were removed')
+    return df
+
+
 if __name__ == '__main__':
     df = load_data("ctr_dataset_train")
     data_exploration(df)
+    df = prepare_df_for_learning(df)
