@@ -87,7 +87,7 @@ def parameter_tuning(x, y):
 if __name__ == '__main__':
     df = load_data("ctr_dataset_train")
     df = prepare_df_for_learning(df)
-    x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled = get_x_y(df)
+    x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled, x_val, y_val = get_x_y(df)
 
     print('Train on regular data set:')
     clf, test_pred, train_pred = train_xgb(x_train, x_test, y_train, y_test)
@@ -99,4 +99,4 @@ if __name__ == '__main__':
     print_evaluation_metrics(oversampled_clf, oversampled_test_pred, oversampled_train_pred, x_train, x_test,
                              y_train, y_test, True)
 
-    parameter_tuning(x, y)
+    parameter_tuning(x_val, y_val)

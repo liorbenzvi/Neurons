@@ -102,9 +102,10 @@ def get_x_y(df):
     y_filter = ['Purchase']
     x_filter = df.columns[~df.columns.isin(y_filter)]
     x_train, x_test, y_train, y_test = train_test_split(df[x_filter], df[y_filter], test_size=0.2, random_state=1)
+    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.25, random_state=8)
     x_train_resampled, y_train_resampled = oversampling_with_smote(x_train, y_train)
     print_oversampling_info(x_train, x_train_resampled)
-    return x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled
+    return x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled, x_val, y_val
 
 
 def print_oversampling_info(x_train, x_train_resampled):
