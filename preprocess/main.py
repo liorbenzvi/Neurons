@@ -1,6 +1,8 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import matplotlib.pyplot as plt
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
 
 
 def load_data(file_name):
@@ -38,10 +40,30 @@ def data_exploration(df):
     print(corr_matrix.to_string())
     plt.imshow(corr_matrix, cmap='hot', interpolation='nearest')
     plt.savefig('correlation_matrix.png')
+    print('\n\n')
+
+
+def oversampling_with_smote(X, y):
+    X_resampled, y_resampled = SMOTE().fit_resample(X, y)
+    return X_resampled, y_resampled
+
+
+def handle_missing_values(df):
+    df = df.fillna(-1)
+    return df
 
 
 def prepare_df_for_learning(df):
     df = remove_rows_without_target_value(df)
+    df = handle_missing_values(df)
+    df = label_encoding(df)
+    return df
+
+
+def label_encoding(df):
+    for col in df.columns:
+        if not is_numeric_dtype(df[col]):
+            df[col] = df[col].astype('category').cat.codes
     return df
 
 
@@ -57,8 +79,21 @@ def remove_rows_without_target_value(df):
     return df
 
 
+def get_x_y(df):
+    y_filter = ['Purchase']
+    x_filter = df.columns[~df.columns.isin(y_filter)]
+    x_train, x_test, y_train, y_test = train_test_split(df[x_filter], df[y_filter], test_size=0.2, random_state=1)
+    x_train_resampled, y_train_resampled = oversampling_with_smote(x_train, y_train)
+    train_rows = len(x_train)
+    resampled_train_rows = len(x_train_resampled)
+    print('Amount of rows in regular training set is: ' + str(train_rows))
+    print('Amount of rows in oversampled training set is: ' + str(resampled_train_rows))
+    print('Added ' + str(resampled_train_rows - train_rows) + ' synthetic rows')
+    return x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled
+
+
 if __name__ == '__main__':
     df = load_data("ctr_dataset_train")
     data_exploration(df)
-    print('\n\n')
     df = prepare_df_for_learning(df)
+    x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled = get_x_y(df)
