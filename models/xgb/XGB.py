@@ -75,7 +75,7 @@ def print_auc_plt(clf, x_test, y_test, is_oversampled):
     plt.clf()
 
 
-def parameter_tuning(x, y):
+def parameter_tuning(x, y, x_test, y_test):
     print('\n\n')
     print('Parameter Tuning: ')
     param_test = {
@@ -90,9 +90,12 @@ def parameter_tuning(x, y):
     gsearch1 = RandomizedSearchCV(estimator=XGBClassifier(), param_distributions=param_test, n_iter=100, cv=3,
                                   verbose=2, random_state=42, n_jobs=-1)
     gsearch1.fit(x, y)
+
     print('\n\nResults: ')
     print(gsearch1.best_params_)
     print(gsearch1.best_score_)
+    y_pred = gsearch1.predict(x_test)
+    print_evaluation_metrics(gsearch1, y_pred, [], x, x_test, y, y_test)
 
 
 if __name__ == '__main__':
@@ -110,4 +113,6 @@ if __name__ == '__main__':
     print_evaluation_metrics(oversampled_clf, oversampled_test_pred, oversampled_train_pred, x_train, x_test,
                              y_train, y_test, True)
 
-    parameter_tuning(x_val, y_val)
+    parameter_tuning(x_val, y_val, x_test, y_test)
+
+
