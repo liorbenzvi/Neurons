@@ -121,4 +121,4 @@ if __name__ == '__main__':
     df = load_data("ctr_dataset_train")
     data_exploration(df)
     df = prepare_df_for_learning(df)
-    x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled = get_x_y(df)
+
