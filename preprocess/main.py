@@ -51,19 +51,20 @@ def oversampling_with_smote(X, y):
     X_resampled, y_resampled = SMOTE().fit_resample(X, y)
     return X_resampled, y_resampled
 
+
 def remove_nans_from_list(X):
     return [x for x in X if numpy.isnan(x) == False]
 
-def fill_with_distribution(df, colomn_name):
-    colomn_without_nans = remove_nans_from_list(df[colomn_name])
-    num_colomn_without_nans = len(colomn_without_nans)
-    num_of_nans = df[colomn_name].isna().sum()
-    count_dict = Counter(colomn_without_nans)
-    values = count_dict.keys()
-    probs = [x/num_colomn_without_nans for x in count_dict.values()]
-    values_to_fill = numpy.random.choice(list(values),size=num_of_nans, p=probs)
-    df.loc[df[colomn_name].isnull(), colomn_name] = values_to_fill
 
+def fill_with_distribution(df, column_name):
+    column_without_nans = remove_nans_from_list(df[column_name])
+    num_column_without_nans = len(column_without_nans)
+    num_of_nans = df[column_name].isna().sum()
+    count_dict = Counter(column_without_nans)
+    values = count_dict.keys()
+    probs = [x / num_column_without_nans for x in count_dict.values()]
+    values_to_fill = numpy.random.choice(list(values), size=num_of_nans, p=probs)
+    df.loc[df[column_name].isnull(), column_name] = values_to_fill
 
 
 def handle_missing_values(df):
@@ -71,14 +72,19 @@ def handle_missing_values(df):
     df['Date'] = df['Date'].fillna(df['Date'].value_counts().idxmax())
     df['Credit_score'] = df['Credit_score'].fillna(df['Credit_score'].value_counts().idxmax())
 
-    df['Insurance_risk_score  '] = df['Insurance_risk_score  '].fillna(median(remove_nans_from_list(df['Insurance_risk_score  '])))
+    df['Insurance_risk_score  '] = df['Insurance_risk_score  '].fillna(
+        median(remove_nans_from_list(df['Insurance_risk_score  '])))
     df['Garden_m2'] = df['Garden_m2'].fillna(median(remove_nans_from_list(remove_nans_from_list(df['Garden_m2']))))
-    df['Living_room_m2'] = df['Living_room_m2'].fillna(median(remove_nans_from_list(remove_nans_from_list(df['Living_room_m2']))))
-    df['Bedrooms_ m2'] = df['Bedrooms_ m2'].fillna(median(remove_nans_from_list(remove_nans_from_list(df['Bedrooms_ m2']))))
+    df['Living_room_m2'] = df['Living_room_m2'].fillna(
+        median(remove_nans_from_list(remove_nans_from_list(df['Living_room_m2']))))
+    df['Bedrooms_ m2'] = df['Bedrooms_ m2'].fillna(
+        median(remove_nans_from_list(remove_nans_from_list(df['Bedrooms_ m2']))))
     df['Home_age'] = df['Home_age'].fillna(median(remove_nans_from_list(remove_nans_from_list(df['Home_age']))))
     df['Home_evaluation'] = df['Home_evaluation'].fillna(median(remove_nans_from_list(df['Home_evaluation'])))
-    df['Paid_life_premium '] = df['Paid_life_premium '].fillna(numpy.average(remove_nans_from_list(df['Paid_life_premium '])))
-    df['Offered_dwelling insurance'] = df['Offered_dwelling insurance'].fillna(median(remove_nans_from_list(df['Offered_dwelling insurance'])))
+    df['Paid_life_premium '] = df['Paid_life_premium '].fillna(
+        numpy.average(remove_nans_from_list(df['Paid_life_premium '])))
+    df['Offered_dwelling insurance'] = df['Offered_dwelling insurance'].fillna(
+        median(remove_nans_from_list(df['Offered_dwelling insurance'])))
     fill_with_distribution(df, 'Floor')
     fill_with_distribution(df, 'Num_residents_floor')
     df.dropna()
@@ -107,6 +113,7 @@ def prepare_df_for_learning(df):
     df = handle_missing_values(df)
     df = add_new_features(df)
     df = label_encoding(df)
+    df = norm_data(df)
     return df
 
 
@@ -115,6 +122,35 @@ def label_encoding(df):
         if not is_numeric_dtype(df[col]):
             df[col] = df[col].astype('category').cat.codes
     return df
+
+
+def one_hot_encode(df, column):
+    one_hot = pd.get_dummies(df[column], prefix=column)
+    df = df.drop(column, axis=1)
+    df = df.join(one_hot)
+    return df
+
+def plot_hist(df, column):
+    plt.hist(df[column], density=True, bins=30)  # density=False would make counts
+    plt.ylabel('Probability')
+    plt.xlabel(column);
+    plt.show()
+
+def norm_data(df):
+   # for column in df.columns:
+   #     plot_hist(df, column)
+    df = one_hot_encode(df, "City")
+    df = one_hot_encode(df, "Insurance_district")
+    unnamed = df["Unnamed: 0"]
+    id = df["User_ID"]
+    df = df.drop("Unnamed: 0", axis=1)
+    df = df.drop("User_ID", axis=1)
+    normalized_df = (df - df.min()) / (df.max() - df.min())
+    normalized_df["Unnamed: 0"] = unnamed
+    normalized_df["User_ID"] = id
+
+    #normalized_df = (df - df.mean()) / df.std()
+    return normalized_df
 
 
 def remove_rows_without_target_value(df):
@@ -153,4 +189,3 @@ if __name__ == '__main__':
     df = load_data("ctr_dataset_train")
     data_exploration(df)
     df = prepare_df_for_learning(df)
-
