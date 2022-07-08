@@ -1,8 +1,12 @@
+from collections import Counter
+
+import numpy
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
+from statistics import median
 
 
 def load_data(file_name):
@@ -47,10 +51,37 @@ def oversampling_with_smote(X, y):
     X_resampled, y_resampled = SMOTE().fit_resample(X, y)
     return X_resampled, y_resampled
 
+def remove_nans_from_list(X):
+    return [x for x in X if numpy.isnan(x) == False]
+
+def fill_with_distribution(df, colomn_name):
+    colomn_without_nans = remove_nans_from_list(df[colomn_name])
+    num_colomn_without_nans = len(colomn_without_nans)
+    num_of_nans = df[colomn_name].isna().sum()
+    count_dict = Counter(colomn_without_nans)
+    values = count_dict.keys()
+    probs = [x/num_colomn_without_nans for x in count_dict.values()]
+    values_to_fill = numpy.random.choice(list(values),size=num_of_nans, p=probs)
+    df.loc[df[colomn_name].isnull(), colomn_name] = values_to_fill
+
+
 
 def handle_missing_values(df):
-    # todo please complete this method
-    df = df.fillna(-1)
+    df['Gender'] = df['Gender'].fillna(df['Gender'].value_counts().idxmax())
+    df['Date'] = df['Date'].fillna(df['Date'].value_counts().idxmax())
+    df['Credit_score'] = df['Credit_score'].fillna(df['Credit_score'].value_counts().idxmax())
+
+    df['Insurance_risk_score  '] = df['Insurance_risk_score  '].fillna(median(remove_nans_from_list(df['Insurance_risk_score  '])))
+    df['Garden_m2'] = df['Garden_m2'].fillna(median(remove_nans_from_list(remove_nans_from_list(df['Garden_m2']))))
+    df['Living_room_m2'] = df['Living_room_m2'].fillna(median(remove_nans_from_list(remove_nans_from_list(df['Living_room_m2']))))
+    df['Bedrooms_ m2'] = df['Bedrooms_ m2'].fillna(median(remove_nans_from_list(remove_nans_from_list(df['Bedrooms_ m2']))))
+    df['Home_age'] = df['Home_age'].fillna(median(remove_nans_from_list(remove_nans_from_list(df['Home_age']))))
+    df['Home_evaluation'] = df['Home_evaluation'].fillna(median(remove_nans_from_list(df['Home_evaluation'])))
+    df['Paid_life_premium '] = df['Paid_life_premium '].fillna(numpy.average(remove_nans_from_list(df['Paid_life_premium '])))
+    df['Offered_dwelling insurance'] = df['Offered_dwelling insurance'].fillna(median(remove_nans_from_list(df['Offered_dwelling insurance'])))
+    fill_with_distribution(df, 'Floor')
+    fill_with_distribution(df, 'Num_residents_floor')
+    df.dropna()
     return df
 
 
