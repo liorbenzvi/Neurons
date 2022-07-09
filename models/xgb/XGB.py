@@ -41,7 +41,7 @@ def print_confusion_matrix(clf, x, y, is_oversampled=False):
     disp.ax_.set_title('Confusion matrix')
     print(disp.confusion_matrix)
     file_name = 'oversampled_confusion_matrix' if is_oversampled else 'confusion_matrix'
-    plt.savefig('png_files/' + file_name + '.png', dpi=150)
+    plt.savefig(file_name + '.png', dpi=150)
     plt.clf()
 
 
@@ -71,7 +71,7 @@ def print_auc_plt(clf, x_test, y_test, is_oversampled):
     plt.plot(fpr, tpr, label="data 1, auc=" + str(auc))
     plt.legend(loc=4)
     file_name = 'oversampled_auc_plt' if is_oversampled else 'auc_plt'
-    plt.savefig('png_files/' + file_name + '.png', dpi=150)
+    plt.savefig(file_name + '.png', dpi=150)
     plt.clf()
 
 
