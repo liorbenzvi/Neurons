@@ -36,12 +36,13 @@ def print_accuracy(test_pred, y_test, train_pred, y_train):
         print("Accuracy is: {0} %".format(str(round((correct / total) * 100, 2))))
 
 
-def print_confusion_matrix(clf, x, y, is_oversampled=False):
+def print_confusion_matrix(clf, x, y, is_oversampled, is_tuned):
     print('Confusion matrix: ')
-    disp = ConfusionMatrixDisplay.from_estimator(clf, x, y, cmap=plt.cm.Blues)
-    disp.ax_.set_title('Confusion matrix')
-    print(disp.confusion_matrix)
     file_name = 'oversampled_confusion_matrix' if is_oversampled else 'confusion_matrix'
+    file_name = "tuned_" + file_name if is_tuned else file_name
+    disp = ConfusionMatrixDisplay.from_estimator(clf, x, y, cmap=plt.cm.Blues)
+    disp.ax_.set_title(file_name)
+    print(disp.confusion_matrix)
     plt.savefig(file_name + '.png', dpi=150)
     plt.clf()
 
@@ -57,21 +58,23 @@ def print_business_value(y_true, y_pred):
 def print_evaluation_metrics(clf, test_pred, train_pred, x_train, x_test, y_train, y_test, is_oversampled=False):
     print('\n\n')
     print('Model evaluation_metrics: ')
+    is_tuned = len(train_pred) == 0
     print_accuracy(test_pred, y_test, train_pred, y_train)
-    print_confusion_matrix(clf, x_test, y_test, is_oversampled)
+    print_confusion_matrix(clf, x_test, y_test, is_oversampled, is_tuned)
     print('Precision score is: ' + str(precision_score(y_test, test_pred)))
     print('Recall score is: ' + str(recall_score(y_test, test_pred)))
-    print_auc_plt(clf, x_test, y_test, is_oversampled)
+    print_auc_plt(clf, x_test, y_test, is_oversampled, is_tuned)
     print_business_value(y_test, test_pred)
 
 
-def print_auc_plt(clf, x_test, y_test, is_oversampled):
+def print_auc_plt(clf, x_test, y_test, is_oversampled, is_tuned):
     y_pred_proba = clf.predict_proba(x_test)[::, 1]
     fpr, tpr, _ = metrics.roc_curve(y_test, y_pred_proba)
     auc = metrics.roc_auc_score(y_test, y_pred_proba)
     plt.plot(fpr, tpr, label="data 1, auc=" + str(auc))
     plt.legend(loc=4)
     file_name = 'oversampled_auc_plt' if is_oversampled else 'auc_plt'
+    file_name = "tuned_" + file_name if is_tuned else file_name
     plt.savefig(file_name + '.png', dpi=150)
     plt.clf()
 
