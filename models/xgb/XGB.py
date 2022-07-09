@@ -30,9 +30,10 @@ def print_accuracy(test_pred, y_test, train_pred, y_train):
     print('Accuracy on Test Set:')
     correct, total = calc_acc(test_pred, y_test)
     print("Accuracy is: {0} %".format(str(round((correct / total) * 100, 2))))
-    print('Accuracy on Train Set:')
-    correct, total = calc_acc(train_pred, y_train)
-    print("Accuracy is: {0} %".format(str(round((correct / total) * 100, 2))))
+    if len(train_pred) != 0:
+        print('Accuracy on Train Set:')
+        correct, total = calc_acc(train_pred, y_train)
+        print("Accuracy is: {0} %".format(str(round((correct / total) * 100, 2))))
 
 
 def print_confusion_matrix(clf, x, y, is_oversampled=False):
@@ -95,7 +96,7 @@ def parameter_tuning(x, y, x_test, y_test):
     print(gsearch1.best_params_)
     print(gsearch1.best_score_)
     y_pred = gsearch1.predict(x_test)
-    print_evaluation_metrics(gsearch1, y_pred, [], x, x_test, y, y_test)
+    print_evaluation_metrics(gsearch1, y_pred, [], [], x_test, [], y_test)
 
 
 if __name__ == '__main__':
