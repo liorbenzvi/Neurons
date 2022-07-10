@@ -3,7 +3,7 @@ from sklearn import metrics
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import ConfusionMatrixDisplay, recall_score
-
+import tensorflow as tf
 
 def calc_acc(pred, actual):
     total = len(pred)
@@ -29,6 +29,10 @@ def print_confusion_matrix(model_name, clf, x, y, is_oversampled, is_tuned):
     print(disp.confusion_matrix)
     plt.savefig(file_name + '.png', dpi=150)
     plt.clf()
+
+def print_conf_matrix_add(labels, predictions ):
+    res = tf.math.confusion_matrix(labels, predictions)
+    print('Confusion_matrix: ', res)
 
 
 def get_name(is_oversampled, is_tuned, model_name):
@@ -65,12 +69,15 @@ def get_auc_file_name(is_oversampled, is_tuned, name):
 
 
 def print_evaluation_metrics(model_name, clf, test_pred, train_pred, x_train, x_test, y_train, y_test,
-                             is_oversampled=False):
+                             is_oversampled=False, isAnn = False):
     print('\n\n')
     print('Model ' + model_name + ' evaluation_metrics: ')
     is_tuned = len(train_pred) == 0
     print_accuracy(test_pred, y_test, train_pred, y_train)
-    print_confusion_matrix(model_name, clf, x_test, y_test, is_oversampled, is_tuned)
+    if isAnn:
+        print_conf_matrix_add(y_test, test_pred)
+    else:
+        print_confusion_matrix(model_name, clf, x_test, y_test, is_oversampled, is_tuned)
     print('Precision score is: ' + str(precision_score(y_test, test_pred)))
     print('Recall score is: ' + str(recall_score(y_test, test_pred)))
     print_auc_plt(model_name, clf, x_test, y_test, is_oversampled, is_tuned)

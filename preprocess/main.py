@@ -11,7 +11,7 @@ from statistics import median
 
 def load_data(file_name):
     print("Load data from file: " + file_name)
-    df = pd.read_csv("../data/" + file_name + ".csv", encoding="UTF-8")
+    df = pd.read_csv("../../data/" + file_name + ".csv", encoding="UTF-8")
     print(df.head())
     df["Purchase"] = df["Purchase"].fillna(-1)
     df["Purchase"] = df["Purchase"].astype(int)
