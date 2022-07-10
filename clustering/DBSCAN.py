@@ -86,6 +86,9 @@ if __name__ == '__main__':
     labels = train_dbscan()
     print_results()
     plot_results()
+    # parameter_tuning()
+    # print_results()
+    # plot_results()
 
 
 
