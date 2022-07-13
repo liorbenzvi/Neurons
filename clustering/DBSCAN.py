@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn import datasets, metrics
+from sklearn.manifold import TSNE
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import DBSCAN
@@ -28,46 +29,56 @@ def get_df():
     print(df.head())
     print("Dataset shape:", df.shape)
     print("Do we see Null values? - " + str(df.isnull().any().any()))
-    x = StandardScaler().fit_transform(df)
+    # x = StandardScaler().fit_transform(df)
+    x = TSNE(n_components=2, perplexity=perplexity).fit_transform(df)
     return x
 
 
 def train_dbscan():
     print('\n')
     print('Training DBSCAN..')
-    db = DBSCAN(min_samples=5, eps=1.75).fit(x)
+    db = DBSCAN(min_samples=5, eps=eps).fit(x)
     print('Done training DBSCAN')
     return db.labels_
 
 
-def print_results():
+def print_results(labels_print, x_print):
     print('\n')
     print('Results: ')
-    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
-    n_noise_ = list(labels).count(-1)
+    n_clusters_ = len(set(labels_print)) - (1 if -1 in labels_print else 0)
+    n_noise_ = list(labels_print).count(-1)
     print("Estimated number of clusters: %d" % n_clusters_)
     print("Estimated number of noise points: %d" % n_noise_)
+    print("Silhouette Coefficient: " + str(metrics.silhouette_score(x_print, labels_print)))
+    print("Calinski-Harabasz score: " + str(metrics.calinski_harabasz_score(x_print, labels_print)))
+    print("Davies-Bouldin score: " + str(metrics.davies_bouldin_score(x_print, labels_print)))
 
 
 def plot_results():
     colors = [
-              'black', 'royalblue', 'maroon', 'forestgreen', 'mediumorchid',
-              'deeppink', 'olive', 'goldenrod', 'lightcyan', 'navy',
-              'blue', 'yellow', 'lime', 'teal', 'aqua',
-              'beige', 'tan', 'brown', 'pink', 'coral', 'firebrick', 'purple'
-              ]
+        'DarkCyan', 'royalblue', 'maroon', 'forestgreen', 'mediumorchid',
+        'deeppink', 'olive', 'goldenrod', 'lightcyan', 'navy',
+        'blue', 'yellow', 'lime', 'teal', 'aqua',
+        'beige', 'tan', 'brown', 'pink', 'coral', 'firebrick', 'purple',
+        'DarkSalmon', 'Crimson', 'Salmon', 'IndianRed', 'HotPink',
+        'DeepPink', 'MediumVioletRed', 'PaleVioletRed', 'Orange', 'OrangeRed',
+        'Gold', 'LightYellow', 'DarkKhaki', 'Lavender', 'Fuchsia',
+        'BlueViolet', 'Indigo', 'DarkSlateBlue', 'SpringGreen', 'black'
+    ]
     vectorizer = np.vectorize(lambda i: colors[i % len(colors)])
     colors = vectorizer(labels)
     print('\n')
     print_color_map(colors)
-    print("Reduce dimension by PCA")
-    values = PCA(n_components=1).fit_transform(x)
-    sample_name = np.array(range(0, 2500))
-    plt.scatter(sample_name, values, c=colors)
+    # print("Reduce dimension by PCA")
+    # values = PCA(n_components=1).fit_transform(x)
+    # sample_name = np.array(range(0, 2500))
+    # plt.scatter(sample_name, values, c=colors)
+    plt.scatter(x[:, 0], x[:, 1], c=colors)
     plt.title("Plotting data frame clustering results - DBSCAN")
     plt.xlabel("X - index of samples")
     plt.ylabel("Y - values")
     plt.legend()
+    plt.show()
     plt.savefig('dbscan_clustering_results.png', dpi=150)
     plt.clf()
 
@@ -80,15 +91,29 @@ def print_color_map(colors):
         print(c)
 
 
-if __name__ == '__main__':
-    x = get_df()
+def choose_perplexity_for_TSNE():
+    df_tsne = pd.read_csv("../data/Clustering.csv", encoding="UTF-8")
+    for i, p in enumerate([10, 20, 30, 40, 50, 60, 70, 80, 85, 90]):
+        print('**************** ' + str(i) + " , " + str(p) + ' *********************')
+        x_tsne = TSNE(n_components=2, perplexity=p).fit_transform(df_tsne)
+        db_tsne = DBSCAN(min_samples=5, eps=eps).fit(x_tsne)
+        print_results(db_tsne.labels_, x_tsne)
+
+
+def choose_parameters():
+    print('******************************** choose_parameters ********************************')
     find_eps_by_knn()
+    choose_perplexity_for_TSNE()
+    print('******************************** choose_parameters ********************************')
+
+
+if __name__ == '__main__':
+    eps = 1.4
+    perplexity = 85
+
+    x = get_df()
+    choose_parameters()
     labels = train_dbscan()
-    print_results()
+    print_results(labels, x)
     plot_results()
-    # parameter_tuning()
-    # print_results()
-    # plot_results()
-
-
 
