@@ -31,8 +31,9 @@ def print_confusion_matrix(model_name, clf, x, y, is_oversampled, is_tuned):
     plt.clf()
 
 def print_conf_matrix_add(labels, predictions ):
-    res = tf.math.confusion_matrix(labels, predictions)
-    print('Confusion_matrix: ', res)
+    matrix = metrics.confusion_matrix(labels, predictions)
+    print('Confusion_matrix: ')
+    print(matrix)
 
 
 def get_name(is_oversampled, is_tuned, model_name):
@@ -50,8 +51,9 @@ def print_business_value(y_true, y_pred):
     print('Total business value from model is: ' + str(TP * 420 - FP * 200))
 
 
-def print_auc_plt(name, clf, x_test, y_test, is_oversampled, is_tuned):
-    y_pred_proba = clf.predict_proba(x_test)[::, 1]
+def print_auc_plt(name, clf, x_test, y_test, is_oversampled, is_tuned, is_ann=False):
+    idx = 0 if is_ann else 1
+    y_pred_proba = clf.predict_proba(x_test)[::, idx]
     fpr, tpr, _ = metrics.roc_curve(y_test, y_pred_proba)
     auc = metrics.roc_auc_score(y_test, y_pred_proba)
     plt.plot(fpr, tpr, label="data 1, auc=" + str(auc))
@@ -80,5 +82,5 @@ def print_evaluation_metrics(model_name, clf, test_pred, train_pred, x_train, x_
         print_confusion_matrix(model_name, clf, x_test, y_test, is_oversampled, is_tuned)
     print('Precision score is: ' + str(precision_score(y_test, test_pred)))
     print('Recall score is: ' + str(recall_score(y_test, test_pred)))
-    print_auc_plt(model_name, clf, x_test, y_test, is_oversampled, is_tuned)
+    print_auc_plt(model_name, clf, x_test, y_test, is_oversampled, is_tuned, isAnn)
     print_business_value(y_test, test_pred)
