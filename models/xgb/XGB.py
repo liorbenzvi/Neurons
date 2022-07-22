@@ -3,6 +3,8 @@ from xgboost import XGBClassifier
 from models.utils import print_evaluation_metrics
 from preprocess.main import load_data, prepare_df_for_learning, get_x_y
 from sklearn.model_selection import RandomizedSearchCV
+import numpy as np
+import shap
 
 
 def train_xgb(x_train, x_test, y_train, y_test):
@@ -41,12 +43,25 @@ def parameter_tuning(x, y, x_test, y_test):
 
 
 if __name__ == '__main__':
+    print_shap = False
     df = load_data("ctr_dataset_train")
     df = prepare_df_for_learning(df)
     x_train, x_test, y_train, y_test, x_train_resampled, y_train_resampled, x_val, y_val = get_x_y(df)
 
     print('Train on regular data set:')
     clf, test_pred, train_pred = train_xgb(x_train, x_test, y_train, y_test)
+    if print_shap:
+        # Fits the explainer
+        explainer = shap.Explainer(clf.predict, x_test)
+        # Calculates the SHAP values - It takes some time
+
+        shap_values = explainer(x_test)
+        for i in range(0,5):
+            x = np.random.randint(0, len(x_test))
+            shap.plots.waterfall(shap_values[x])
+
+        shap.summary_plot(shap_values)
+
     print_evaluation_metrics("XGB", clf, test_pred, train_pred, x_train, x_test, y_train, y_test)
     print('\n\n')
 

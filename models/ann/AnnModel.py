@@ -1,9 +1,6 @@
 import numpy
 import tensorflow as tf
-from setuptools.command.test import test
-from sklearn.model_selection import train_test_split
 from tensorflow import keras
-import tensorflow.keras.backend as kb
 import keras_tuner as kt
 from sklearn import utils
 
@@ -60,10 +57,10 @@ if __name__ == '__main__':
     model = tuner.hypermodel.build(best_hps)
 
     model.fit(
-        x_train_resampled,
-        y_train_resampled,
+        x_train,
+        y_train,
         shuffle=True,
-        epochs = 150,
+        epochs = 500,
         batch_size = 64
     )
 

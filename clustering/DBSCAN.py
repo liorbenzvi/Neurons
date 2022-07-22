@@ -19,7 +19,7 @@ def find_eps_by_knn():
     plt.clf()
 
 
-def get_df():
+def get_df(perplexity):
     df = pd.read_csv("../data/Clustering.csv", encoding="UTF-8")
     print('DF info: ')
     print(df.head())
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     eps = 1.4
     perplexity = 85
 
-    x = get_df()
+    x = get_df(perplexity)
     choose_parameters()
     labels = train_dbscan()
     print_results(labels, x)
