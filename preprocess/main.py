@@ -141,15 +141,15 @@ def norm_data(df):
    #     plot_hist(df, column)
     df = one_hot_encode(df, "City")
     df = one_hot_encode(df, "Insurance_district")
-    unnamed = df["Unnamed: 0"]
+    if "Unnamed: 0" in df.columns:
+        unnamed = df["Unnamed: 0"]
+        df = df.drop("Unnamed: 0", axis=1)
     id = df["User_ID"]
-    df = df.drop("Unnamed: 0", axis=1)
     df = df.drop("User_ID", axis=1)
     normalized_df = (df - df.min()) / (df.max() - df.min())
-    normalized_df["Unnamed: 0"] = unnamed
+    if "Unnamed: 0" in df.columns:
+        normalized_df["Unnamed: 0"] = unnamed
     normalized_df["User_ID"] = id
-
-    #normalized_df = (df - df.mean()) / df.std()
     return normalized_df
 
 
@@ -157,8 +157,9 @@ def remove_rows_without_target_value(df):
     print('Remove rows without target value: ')
     rows_before = len(df)
     print('Amount of rows in df is: ' + str(rows_before))
-    print('Going to remove rows without Purchase value')
-    df = df.drop(df[df.Purchase == -1].index)
+    if 'Purchase' in df.columns:
+        print('Going to remove rows without Purchase value')
+        df = df.drop(df[df.Purchase == -1].index)
     rows_after = len(df)
     print('Amount of rows in df is: ' + str(rows_after))
     print('Total ' + str(rows_before - rows_after) + ' rows were removed')
